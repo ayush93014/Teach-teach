@@ -10,9 +10,9 @@ export function TeacherCard({ teacher }: { teacher: Teacher & { name: string } }
     .toUpperCase();
 
   return (
-    <Link href={`/teacher/${teacher.id}`} className="card block hover:border-blue-300">
+    <Link href={`/teacher/${teacher.id}`} className="card card-hover block">
       <div className="flex items-start gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">
           {initials}
         </div>
         <div className="space-y-1">

@@ -76,15 +76,18 @@ export default function SignupPage() {
 
   return (
     <main className="max-page flex min-h-screen items-center justify-center py-10">
-      <form onSubmit={handleSignup} className="card w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold">Sign up</h1>
+      <form onSubmit={handleSignup} className="card w-full max-w-md space-y-4 shadow-md">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Sign up</h1>
+          <p className="text-sm text-slate-600">Create your account in under a minute.</p>
+        </div>
         <ConfigWarning />
         <input
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Full Name"
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="input"
         />
         <input
           required
@@ -92,7 +95,7 @@ export default function SignupPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="input"
         />
         <input
           required
@@ -100,12 +103,12 @@ export default function SignupPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="input"
         />
         <select
           value={department}
           onChange={(e) => setDepartment(e.target.value as Department)}
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="select"
         >
           {DEPARTMENTS.map((dept) => (
             <option key={dept} value={dept}>
@@ -116,7 +119,7 @@ export default function SignupPage() {
         <select
           value={role}
           onChange={(e) => setRole(e.target.value as Role)}
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="select"
         >
           {ROLES.map((roleOption) => (
             <option key={roleOption} value={roleOption}>
@@ -128,14 +131,14 @@ export default function SignupPage() {
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <button
           disabled={loading}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-70"
+          className="btn-accent w-full"
           type="submit"
         >
           {loading ? "Creating account..." : "Sign up"}
         </button>
         <p className="text-sm text-slate-600">
           Already have an account?{" "}
-          <Link href="/auth/login" className="font-medium text-blue-600">
+          <Link href="/auth/login" className="link">
             Log in
           </Link>
         </p>

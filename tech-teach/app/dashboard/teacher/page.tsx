@@ -91,12 +91,12 @@ export default async function TeacherDashboardPage() {
               name="title"
               required
               placeholder="Lecture title"
-              className="rounded-lg border border-slate-300 p-2.5"
+              className="input"
             />
-            <input name="date" required type="date" className="rounded-lg border border-slate-300 p-2.5" />
+            <input name="date" required type="date" className="input" />
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              className="btn-accent"
             >
               Add Lecture
             </button>
@@ -116,7 +116,7 @@ export default async function TeacherDashboardPage() {
         {teacher ? (
           <Link
             href={`/teacher/${teacher.id}`}
-            className="inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="btn-outline w-fit"
           >
             View Public Teacher Profile
           </Link>

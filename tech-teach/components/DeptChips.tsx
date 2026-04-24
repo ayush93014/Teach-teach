@@ -17,10 +17,10 @@ export function DeptChips() {
             key={dept}
             type="button"
             onClick={() => router.push(`/dashboard/student?dept=${dept}`)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
               selected
                 ? "bg-blue-600 text-white"
-                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
             }`}
           >
             {dept}

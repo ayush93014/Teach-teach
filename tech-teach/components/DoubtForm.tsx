@@ -92,13 +92,16 @@ export function DoubtForm({ lectureId, subject, onSubmitted }: DoubtFormProps) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="card space-y-3">
-      <h3 className="text-lg font-semibold">Ask a Doubt</h3>
+      <div className="space-y-1">
+        <h3 className="text-lg font-semibold">Ask a Doubt</h3>
+        <p className="text-sm text-slate-600">Include as much detail as possible (and a file if needed).</p>
+      </div>
       <textarea
         rows={5}
         value={questionText}
         onChange={(e) => setQuestionText(e.target.value)}
         placeholder="Type your question here..."
-        className="w-full rounded-lg border border-slate-300 p-3 text-sm outline-none ring-blue-500 focus:ring"
+        className="textarea"
         required
       />
       <input
@@ -111,7 +114,7 @@ export function DoubtForm({ lectureId, subject, onSubmitted }: DoubtFormProps) {
       <button
         disabled={loading}
         type="submit"
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+        className="btn-accent"
       >
         {loading ? "Submitting..." : "Submit Doubt"}
       </button>

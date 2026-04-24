@@ -21,20 +21,20 @@ export function Navbar({ role, name }: NavbarProps) {
   };
 
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
       <div className="max-page flex h-16 items-center justify-between">
-        <Link href="/dashboard" className="text-lg font-semibold text-slate-900">
-          Tech-Teach
+        <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-slate-900">
+          <span className="rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 bg-clip-text text-transparent">
+            Tech-Teach
+          </span>
         </Link>
         <div className="flex items-center gap-3">
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase text-slate-700">
-            {role}
-          </span>
+          <span className="badge uppercase">{role}</span>
           <span className="hidden text-sm text-slate-600 md:block">{name}</span>
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
+            className="btn-primary px-3 py-1.5"
           >
             Logout
           </button>

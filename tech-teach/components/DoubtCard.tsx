@@ -50,10 +50,10 @@ export function DoubtCard({ doubt, canAnswer, onAnswered }: DoubtCardProps) {
           {doubt.profiles?.name ?? "Student"}
         </p>
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+          className={`${
             doubt.status === "answered"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-amber-100 text-amber-700"
+              ? "badge-good"
+              : "badge-warn"
           }`}
         >
           {doubt.status}
@@ -77,7 +77,7 @@ export function DoubtCard({ doubt, canAnswer, onAnswered }: DoubtCardProps) {
             value={answerText}
             onChange={(e) => setAnswerText(e.target.value)}
             placeholder="Write your final answer..."
-            className="w-full rounded-lg border border-slate-300 p-2 text-sm outline-none ring-blue-500 focus:ring"
+            className="textarea min-h-[96px]"
             rows={4}
           />
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -85,7 +85,7 @@ export function DoubtCard({ doubt, canAnswer, onAnswered }: DoubtCardProps) {
             type="button"
             onClick={submitAnswer}
             disabled={isSubmitting}
-            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="btn-accent"
           >
             {isSubmitting ? "Submitting..." : "Submit Answer"}
           </button>

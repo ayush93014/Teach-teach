@@ -68,8 +68,11 @@ export default function LoginPage() {
 
   return (
     <main className="max-page flex min-h-screen items-center justify-center py-10">
-      <form onSubmit={handleLogin} className="card w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold">Log in</h1>
+      <form onSubmit={handleLogin} className="card w-full max-w-md space-y-4 shadow-md">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Log in</h1>
+          <p className="text-sm text-slate-600">Welcome back. Continue to your dashboard.</p>
+        </div>
         <ConfigWarning />
         <input
           required
@@ -77,7 +80,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="input"
         />
         <input
           required
@@ -85,12 +88,12 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="input"
         />
         <select
           value={roleChoice}
           onChange={(e) => setRoleChoice(e.target.value as Role)}
-          className="w-full rounded-lg border border-slate-300 p-2.5"
+          className="select"
         >
           {ROLES.map((role) => (
             <option key={role} value={role}>
@@ -101,14 +104,14 @@ export default function LoginPage() {
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <button
           disabled={loading}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-70"
+          className="btn-accent w-full"
           type="submit"
         >
           {loading ? "Logging in..." : "Log in"}
         </button>
         <p className="text-sm text-slate-600">
           Need an account?{" "}
-          <Link href="/auth/signup" className="font-medium text-blue-600">
+          <Link href="/auth/signup" className="link">
             Sign up
           </Link>
         </p>

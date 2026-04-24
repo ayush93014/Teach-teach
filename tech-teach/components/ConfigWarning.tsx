@@ -29,9 +29,12 @@ export function ConfigWarning() {
   }
 
   return (
-    <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+    <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-sm text-amber-950">
       <p className="font-semibold">Setup needed before login/sign up</p>
-      <p className="mt-1">Add these keys in `.env.local`, then restart `npm run dev`:</p>
+      <p className="mt-1 text-amber-900/90">
+        Add these keys in <span className="font-mono">.env.local</span>, then restart{" "}
+        <span className="font-mono">npm run dev</span>:
+      </p>
       <ul className="mt-1 list-disc pl-5">
         {status.missing.map((key) => (
           <li key={key}>{key}</li>

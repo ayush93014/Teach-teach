@@ -4,7 +4,7 @@ import type { LectureWithMeta } from "@/types";
 
 export function LectureCard({ lecture }: { lecture: LectureWithMeta }) {
   return (
-    <Link href={`/lecture/${lecture.id}`} className="card block hover:border-blue-300">
+    <Link href={`/lecture/${lecture.id}`} className="card card-hover block">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="text-lg font-semibold text-slate-900">{lecture.title}</h3>
@@ -13,10 +13,10 @@ export function LectureCard({ lecture }: { lecture: LectureWithMeta }) {
           </p>
         </div>
         <div className="space-y-1 text-right text-xs">
-          <p className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">
+          <p className="badge-warn">
             Doubts: {lecture.doubt_count}
           </p>
-          <p className="rounded-full bg-slate-100 px-2 py-1 text-slate-700">
+          <p className="badge">
             Uploads: {lecture.upload_count}
           </p>
         </div>

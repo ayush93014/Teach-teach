@@ -8,12 +8,20 @@ type Message = {
   timestamp: Date;
 };
 
+type ChatApiResponse = {
+  type: "technical_issue" | "attendance_issue" | "assignment_issue" | "concept_question" | "other";
+  reply: string;
+  escalate: boolean;
+};
+
 const suggestedQuestions: string[] = [
   "Explain this concept simply",
   "What are the key points?",
   "Can you give an example?",
   "How does this work?",
 ];
+
+const CHAT_API_URL = "http://localhost:3001/api/chat";
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([
@@ -32,7 +40,7 @@ export default function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSendMessage = (text?: string) => {
+  const handleSendMessage = async (text?: string) => {
     const messageText = text ?? inputValue;
     if (!messageText.trim()) return;
 
@@ -47,18 +55,42 @@ export default function App() {
     setInputValue("");
     setIsTyping(true);
 
-    window.setTimeout(() => {
-      setIsTyping(false);
+    try {
+      const res = await fetch(CHAT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: messageText.trim() }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Server response was not ok");
+      }
+
+      const data = (await res.json()) as ChatApiResponse;
+      const replyText =
+        typeof data?.reply === "string" && data.reply.trim()
+          ? data.reply.trim()
+          : "Sorry — I couldn’t generate a response. Please try again.";
 
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I understand your question. Let me help you break this down into simpler concepts...",
+        text: replyText,
         sender: "bot",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botResponse]);
-    }, 1500);
+    } catch {
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Chat server is not reachable. Start the backend with `npm run server` and try again.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {

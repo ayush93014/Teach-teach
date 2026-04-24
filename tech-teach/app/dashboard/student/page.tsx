@@ -59,7 +59,10 @@ export default async function StudentDashboardPage({
       <Navbar role="student" name={profile.name as string} />
       <main className="max-page space-y-4 py-6">
         <div className="card space-y-3">
-          <h1 className="text-2xl font-bold">Find Teachers by Department</h1>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">Find Teachers by Department</h1>
+            <p className="text-sm text-slate-600">Pick your department to see available teachers.</p>
+          </div>
           <DeptChips />
         </div>
         <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">

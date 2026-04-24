@@ -2,6 +2,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
+import { createClient } from "@supabase/supabase-js";
 
 dotenv.config();
 
@@ -120,14 +122,125 @@ async function askGemini(message) {
   return parseModelResponse(text);
 }
 
+async function askGroq(message) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("Missing GROQ_API_KEY in environment");
+
+  const client = new Groq({ apiKey });
+  const preferredModel = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+  const fallbackModel = "llama-3.3-70b-versatile";
+
+  async function run(model) {
+    return await client.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: "system",
+          content: SYSTEM_PROMPT,
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+    });
+  }
+
+  let response;
+  try {
+    response = await run(preferredModel);
+  } catch (error) {
+    const message = String(error?.message || "");
+    // If an env-pinned model was deprecated/decommissioned, retry once with a known-good model.
+    if (
+      preferredModel !== fallbackModel &&
+      /model_decommissioned|decommissioned|no longer supported/i.test(message)
+    ) {
+      response = await run(fallbackModel);
+    } else {
+      throw error;
+    }
+  }
+
+  const text = response?.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Empty Groq response");
+
+  return parseModelResponse(text);
+}
+
 app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body?.message;
+    const lectureId = req.body?.lectureId;
+    const doubtId = req.body?.doubtId;
+    const userId = req.body?.userId;
+
     if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({ error: "Invalid request body. Expected { message: string }" });
     }
 
-    const response = await askGemini(message.trim());
+    let response;
+    // Prefer Groq when configured; only fall back to Gemini if it's configured too.
+    if (process.env.GROQ_API_KEY) {
+      try {
+        response = await askGroq(message.trim());
+      } catch (groqError) {
+        const hasGemini = Boolean(process.env.GEMINI_API_KEY);
+        console.warn(
+          `Groq API failed${hasGemini ? ", falling back to Gemini" : ""}:`,
+          groqError?.message || String(groqError)
+        );
+        if (hasGemini) {
+          response = await askGemini(message.trim());
+        } else {
+          throw groqError;
+        }
+      }
+    } else {
+      response = await askGemini(message.trim());
+    }
+
+    // Save chat message to Supabase if configured
+    try {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        const { data, error } = await supabase.from("chat_messages").insert({
+          user_id: userId || null,
+          lecture_id: lectureId || null,
+          doubt_id: doubtId || null,
+          message: message.trim(),
+          ai_response: response.reply,
+          message_type: response.type,
+          escalate: response.escalate,
+        });
+
+        if (error) {
+          console.warn("Could not save chat to Supabase:", error.message);
+        }
+
+        // If this is for a doubt, update it with AI suggestion
+        if (doubtId && response.type !== "technical_issue") {
+          const { error: updateError } = await supabase
+            .from("doubts")
+            .update({ ai_suggestion: response.reply })
+            .eq("id", doubtId);
+
+          if (updateError) {
+            console.warn("Could not update doubt AI suggestion:", updateError.message);
+          }
+        }
+      }
+    } catch (dbError) {
+      console.warn("Database error:", dbError.message || String(dbError));
+      // Continue anyway - don't fail the chat response if DB is down
+    }
+
     return res.status(200).json(response);
   } catch (error) {
     console.error("POST /api/chat failed:", error);
@@ -137,6 +250,39 @@ app.post("/api/chat", async (req, res) => {
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true });
+});
+
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    name: "Tech-Teach Chatbot API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      chat: {
+        method: "POST",
+        path: "/api/chat",
+        description: "Send a message to the chatbot",
+        body: {
+          message: "string (required) - User message",
+          lectureId: "string (optional) - UUID of the lecture",
+          doubtId: "string (optional) - UUID of the doubt",
+          userId: "string (optional) - UUID of the user",
+        },
+        response: {
+          type: "technical_issue|attendance_issue|assignment_issue|concept_question|other",
+          reply: "string - AI response",
+          escalate: "boolean - Whether to escalate to human support",
+        },
+      },
+      health: {
+        method: "GET",
+        path: "/health",
+        description: "Health check endpoint",
+      },
+    },
+    example:
+      'curl -X POST http://localhost:3001/api/chat -H "Content-Type: application/json" -d \'{"message":"How do I reset my password?"}\'',
+  });
 });
 
 app.listen(PORT, () => {
